@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en" class="no-scrollbar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <title>Mediwise | Secure Access</title>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        
+        /* Absolute Scrollbar Removal for all browsers */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+            overflow: -moz-scrollbars-none;
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+        .cherry-gradient {
+            background: linear-gradient(135deg, #be123c 0%, #e11d48 50%, #fb7185 100%);
+            background-size: 200% 200%;
+        }
+        .bg-mesh {
+            background-color: #ffffff;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(251, 113, 133, 0.12) 0, transparent 40%), 
+                radial-gradient(at 100% 100%, rgba(190, 18, 60, 0.08) 0, transparent 40%);
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        .error-shake { animation: shake 0.4s ease-in-out; }
+    </style>
+</head>
+<body class="bg-mesh min-h-screen flex items-center justify-center p-4 selection:bg-rose-200 no-scrollbar overflow-x-hidden">
+
+    <div class="w-full max-w-[420px] relative">
+        <a href="/" class="group mb-6 inline-flex items-center text-rose-600 font-bold text-[10px] uppercase tracking-[0.2em] hover:text-rose-800 transition-colors ml-2">
+            <div class="w-8 h-8 rounded-xl bg-white shadow-sm flex items-center justify-center mr-3 group-hover:bg-rose-50 group-hover:shadow-rose-100 transition-all border border-slate-100">
+                <i class="fas fa-house text-rose-600"></i>
+            </div>
+            Back to Home
+        </a>
+
+        <div class="glass p-8 md:p-10 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.05)] relative z-10">
+            
+            <div class="text-center mb-8">
+                <div class="w-16 h-16 cherry-gradient rounded-2xl flex items-center justify-center shadow-xl shadow-rose-500/20 mx-auto mb-4 transform -rotate-3">
+                    <i class="fas fa-shield-heart text-white text-2xl"></i>
+                </div>
+                <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight">Welcome Back</h2>
+                <p class="text-slate-500 text-sm font-medium mt-1">Access your secure health vault</p>
+            </div>
+
+            {% if error %}
+            <div class="error-shake mb-6 flex items-center p-4 bg-rose-50 border border-rose-100 rounded-2xl">
+                <div class="flex-shrink-0 w-8 h-8 bg-rose-600 rounded-full flex items-center justify-center mr-3 shadow-lg shadow-rose-200">
+                    <i class="fas fa-exclamation text-white text-xs"></i>
+                </div>
+                <p class="text-[11px] font-bold text-rose-800 tracking-tight leading-relaxed">{{ error }}</p>
+            </div>
+            {% endif %}
+            
+            <form method="POST" class="space-y-5">
+                {% csrf_token %}
+                
+                <div class="space-y-1.5">
+                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Email</label>
+                    <div class="relative group">
+                        <div class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-rose-600 transition-colors">
+                            <i class="fas fa-envelope text-sm"></i>
+                        </div>
+                        <input type="email" name="email" required placeholder="name@example.com" 
+                            class="w-full pl-11 pr-4 py-3.5 bg-white/50 border border-slate-100 rounded-2xl outline-none focus:border-rose-300 focus:ring-4 focus:ring-rose-50 transition-all text-sm text-slate-800">
+                    </div>
+                </div>
+
+                <div class="space-y-1.5">
+                    <div class="flex justify-between items-center ml-1">
+                        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Password</label>
+                        <a href="#" class="text-[10px] font-bold text-rose-500 hover:underline">FORGOT?</a>
+                    </div>
+                    <div class="relative group">
+                        <div class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-rose-600 transition-colors">
+                            <i class="fas fa-lock text-sm"></i>
+                        </div>
+                        <input type="password" name="password" required placeholder="••••••••" 
+                            class="w-full pl-11 pr-4 py-3.5 bg-white/50 border border-slate-100 rounded-2xl outline-none focus:border-rose-300 focus:ring-4 focus:ring-rose-50 transition-all text-sm text-slate-800">
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full cherry-gradient text-white py-4 rounded-2xl font-bold shadow-lg shadow-rose-500/20 hover:scale-[1.01] active:scale-95 transition-all duration-200 flex items-center justify-center group mt-2">
+                    <span>Sign In</span>
+                    <i class="fas fa-chevron-right ml-2 text-xs group-hover:translate-x-1 transition-transform"></i>
+                </button>
+            </form>
+
+            <div class="mt-8 text-center border-t border-slate-100/50 pt-6">
+                <p class="text-slate-400 text-xs font-medium">
+                    Don't have an account? 
+                    <a href="{% url 'register' %}" class="text-rose-600 font-bold hover:text-rose-700 ml-1">Register Now</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

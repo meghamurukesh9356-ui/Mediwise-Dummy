@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Mediwise | Register</title>
+    <style>
+        * { scrollbar-width: none; -ms-overflow-style: none; }
+        *::-webkit-scrollbar { display: none; }
+        body {
+            background-color: #fff1f2;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(251, 113, 133, 0.15) 0, transparent 50%), 
+                radial-gradient(at 100% 100%, rgba(190, 18, 60, 0.1) 0, transparent 50%);
+            overflow: hidden; height: 100vh; display: flex; align-items: center; justify-content: center;
+        }
+        .glass { background: rgba(255, 255, 255, 0.75); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.4); }
+        .cherry-gradient { background: linear-gradient(135deg, #be123c 0%, #fb7185 100%); }
+        .form-container { max-height: 65vh; overflow-y: auto; padding-right: 4px; }
+        .form-section { display: none; opacity: 0; transform: translateY(10px); transition: all 0.4s ease-out; }
+        .form-section.active { display: block; opacity: 1; transform: translateY(0); }
+        input, select {
+            width: 100%; padding: 0.75rem 1rem 0.75rem 2.75rem !important; border-radius: 1rem;
+            border: 1px solid #ffe4e6; background: rgba(255, 255, 255, 0.8); outline: none;
+            transition: all 0.2s; font-size: 0.875rem; appearance: none; height: 3rem;
+        }
+        input:focus, select:focus { border-color: #fb7185; box-shadow: 0 0 0 4px rgba(251, 113, 133, 0.1); background: white; }
+        #success-overlay { display: none; backdrop-filter: blur(12px); background: rgba(255, 255, 255, 0.8); z-index: 999; }
+    </style>
+</head>
+<body>
+
+    <div id="success-overlay" class="fixed inset-0 flex items-center justify-center">
+        <div class="bg-white p-10 rounded-[3rem] shadow-2xl text-center border border-rose-100 animate-bounce">
+            <div class="w-20 h-20 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-check text-3xl"></i>
+            </div>
+            <h3 class="text-2xl font-black text-rose-950">Welcome to Mediwise!</h3>
+            <p class="text-slate-500 mt-2">Registration successful. Processing...</p>
+        </div>
+    </div>
+
+    <a href="/" class="fixed top-8 left-8 w-12 h-12 glass rounded-2xl flex items-center justify-center text-rose-600 hover:scale-110 transition-transform shadow-lg z-50">
+        <i class="fas fa-home"></i>
+    </a>
+
+    <div class="w-full max-w-xl glass rounded-[3rem] shadow-2xl shadow-rose-900/10 relative overflow-hidden">
+        <div class="pt-10 px-10 pb-6 text-center">
+            <div class="w-14 h-14 cherry-gradient rounded-2xl flex items-center justify-center shadow-lg shadow-rose-200 mx-auto mb-4">
+                <i class="fas fa-user-plus text-white text-xl"></i>
+            </div>
+            <h2 class="text-3xl font-black text-rose-950 tracking-tight">Join Mediwise</h2>
+            <p id="role-subtitle" class="text-slate-400 text-sm font-medium mt-1">Select your role to continue</p>
+        </div>
+
+        <div class="form-container px-10 pb-10">
+            <div id="role-selection" class="form-section active">
+                <div class="grid grid-cols-2 gap-6 mb-8 mt-2">
+                    <div onclick="showForm('patient')" class="group p-6 rounded-3xl border border-rose-100 bg-white/50 hover:bg-rose-50 hover:border-rose-300 cursor-pointer transition-all text-center">
+                        <div class="w-12 h-12 bg-pink-100 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
+                            <i class="fas fa-user-injured text-pink-600 text-xl"></i>
+                        </div>
+                        <span class="font-bold text-rose-950">Patient</span>
+                    </div>
+                    <div onclick="showForm('pharmacist')" class="group p-6 rounded-3xl border border-rose-100 bg-white/50 hover:bg-rose-50 hover:border-rose-300 cursor-pointer transition-all text-center">
+                        <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
+                            <i class="fas fa-pills text-purple-600 text-xl"></i>
+                        </div>
+                        <span class="font-bold text-rose-950">Pharmacist</span>
+                    </div>
+                </div>
+                <p class="text-center text-sm text-slate-400">Already have an account? <a href="{% url 'login' %}" class="text-rose-600 font-bold hover:underline">Sign In</a></p>
+            </div>
+
+            <div id="patient-form" class="form-section">
+                <form method="POST" class="space-y-4" id="reg-patient-form">
+                    {% csrf_token %}
+                    <input type="hidden" name="role" value="patient">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="relative">
+                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">First Name</label>
+                            <i class="fas fa-user absolute left-4 bottom-4 text-rose-300 pointer-events-none"></i>
+                            {{ patient_form.first_name }}
+                        </div>
+                        <div class="relative">
+                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Last Name</label>
+                            <i class="fas fa-user absolute left-4 bottom-4 text-rose-300 pointer-events-none"></i>
+                            {{ patient_form.last_name }}
+                        </div>
+                    </div>
+                    <div class="relative">
+                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Gender</label>
+                        <div class="relative flex items-center">
+                            <i class="fas fa-venus-mars absolute left-4 text-rose-300 pointer-events-none"></i>
+                            {{ patient_form.gender }}
+                        </div>
+                    </div>
+                    <div class="relative">
+                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Email Address</label>
+                        <i class="fas fa-envelope absolute left-4 bottom-4 text-rose-300 pointer-events-none"></i>
+                        {{ patient_form.email }}
+                    </div>
+                    <div class="relative">
+                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Password</label>
+                        <i class="fas fa-lock absolute left-4 bottom-4 text-rose-300 pointer-events-none"></i>
+                        {{ patient_form.password }}
+                    </div>
+                    <div class="flex gap-4 pt-4">
+                        <button type="button" onclick="showForm('selection')" class="flex-1 py-4 rounded-2xl font-bold text-rose-600 bg-rose-50 hover:bg-rose-100">Back</button>
+                        <button type="button" onclick="handleSubmit('reg-patient-form')" class="flex-[2] py-4 cherry-gradient text-white rounded-2xl font-black shadow-xl hover:scale-[1.02] transition-transform">Register</button>
+                    </div>
+                </form>
+            </div>
+
+            <div id="pharmacist-form" class="form-section">
+                <form method="POST" class="space-y-4" id="reg-pharmacist-form">
+                    {% csrf_token %}
+                    <input type="hidden" name="role" value="pharmacist">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="relative">
+                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">First Name</label>
+                            <i class="fas fa-user absolute left-4 bottom-4 text-rose-300 pointer-events-none"></i>
+                            {{ pharmacist_form.first_name }}
+                        </div>
+                        <div class="relative">
+                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Last Name</label>
+                            <i class="fas fa-user absolute left-4 bottom-4 text-rose-300 pointer-events-none"></i>
+                            {{ pharmacist_form.last_name }}
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="relative">
+                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">License No.</label>
+                            <i class="fas fa-id-card absolute left-4 bottom-4 text-rose-300 pointer-events-none"></i>
+                            {{ pharmacist_form.license_number }}
+                        </div>
+                        <div class="relative">
+                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Phone</label>
+                            <i class="fas fa-phone absolute left-4 bottom-4 text-rose-300 pointer-events-none"></i>
+                            {{ pharmacist_form.phone_number }}
+                        </div>
+                    </div>
+                    <div class="relative">
+                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Email</label>
+                        <i class="fas fa-envelope absolute left-4 bottom-4 text-rose-300 pointer-events-none"></i>
+                        {{ pharmacist_form.email }}
+                    </div>
+                    <div class="relative">
+                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Password</label>
+                        <i class="fas fa-lock absolute left-4 bottom-4 text-rose-300 pointer-events-none"></i>
+                        {{ pharmacist_form.password }}
+                    </div>
+                    <div class="flex gap-4 pt-4">
+                        <button type="button" onclick="showForm('selection')" class="flex-1 py-4 rounded-2xl font-bold text-rose-600 bg-rose-50 hover:bg-rose-100">Back</button>
+                        <button type="button" onclick="handleSubmit('reg-pharmacist-form')" class="flex-[2] py-4 cherry-gradient text-white rounded-2xl font-black shadow-xl hover:scale-[1.02] transition-transform">Register</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showForm(role) {
+            const subtitle = document.getElementById('role-subtitle');
+            document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
+            
+            if (role === 'selection') {
+                document.getElementById('role-selection').classList.add('active');
+                subtitle.innerText = "Select your role to continue";
+            } else if (role === 'patient') {
+                document.getElementById('patient-form').classList.add('active');
+                subtitle.innerText = "Patient Registration";
+            } else if (role === 'pharmacist') {
+                document.getElementById('pharmacist-form').classList.add('active');
+                subtitle.innerText = "Pharmacist Registration";
+            }
+        }
+
+        function handleSubmit(formId) {
+            const form = document.getElementById(formId);
+            
+            // Show Success Overlay
+            document.getElementById('success-overlay').style.display = 'flex';
+
+            // Wait 1 second for animation, then submit for real
+            setTimeout(() => {
+                form.submit();
+            }, 1000);
+        }
+    </script>
+</body>
+</html>

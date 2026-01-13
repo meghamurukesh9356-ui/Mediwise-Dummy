@@ -1,0 +1,9 @@
+from django.contrib import admin
+from .models import Users, Patient, MediAdmin
+
+
+# Register your models here.
+
+admin.site.register(Users)
+admin.site.register(Patient)
+admin.site.register(MediAdmin)

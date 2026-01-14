@@ -1,228 +1,269 @@
 <!DOCTYPE html>
 <html lang="en" class="scroll-smooth">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
     <title>Mediwise | Admin Core</title>
     <style>
-        /* Consistent with Landing Page */
-        ::-webkit-scrollbar { display: none; }
-        body { -ms-overflow-style: none; scrollbar-width: none; overflow-x: hidden; }
-
-        .glass {
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.5);
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #fcfcfd;
+            background-image: radial-gradient(#e5e7eb 0.5px, transparent 0.5px);
+            background-size: 24px 24px;
         }
 
-        .cherry-gradient {
-            background: linear-gradient(135deg, #be123c 0%, #fb7185 100%);
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
         }
 
-        .bg-mesh {
-            background-color: #fff1f2;
-            background-image: 
-                radial-gradient(at 0% 0%, rgba(251, 113, 133, 0.15) 0, transparent 50%), 
-                radial-gradient(at 100% 100%, rgba(190, 18, 60, 0.1) 0, transparent 50%);
+        ::-webkit-scrollbar-thumb {
+            background: #fda4af;
+            border-radius: 10px;
         }
 
-        /* Sidebar Logic */
-        .sidebar-transition { transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-        .sidebar-expanded { width: 260px; }
-        .sidebar-collapsed { width: 88px; }
+        .sidebar-transition {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
 
-        /* Smooth spacing for main content */
-        .content-transition { transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-        
-        .bento-card {
+        /* Fixed Sidebar Logic */
+        #sidebar {
+            width: 280px;
+        }
+
+        .sidebar-collapsed {
+            width: 88px !important;
+        }
+
+        .main-collapsed {
+            margin-left: 88px !important;
+        }
+
+        /* Floating Nav Item Core */
+        .nav-item {
+            margin: 4px 12px;
+            border-radius: 14px;
             transition: all 0.3s ease;
-            border: 1px solid rgba(251, 113, 133, 0.1);
+            display: flex;
+            align-items: center;
+            padding: 12px;
         }
-        .bento-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 20px 25px -5px rgba(190, 18, 60, 0.05);
-            border-color: rgba(251, 113, 133, 0.3);
+
+        /* Active Link Styling - Expanded */
+        .active-link {
+            background-color: #ffffff;
+            color: #be123c;
+            box-shadow: 0 10px 15px -3px rgba(225, 29, 72, 0.1);
+            border: 1px solid rgba(225, 29, 72, 0.1);
+        }
+
+        /* Logic to fix the "Out of Div" icon when collapsed */
+        .collapsed-active-fix {
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+            border-radius: 0 !important;
+            border-left: 4px solid #be123c;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(244, 63, 94, 0.1);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-up {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+
+        .sidebar-text {
+            transition: opacity 0.2s ease;
+            white-space: nowrap;
         }
     </style>
 </head>
-<body class="bg-mesh min-h-screen text-slate-900 selection:bg-rose-200">
 
-    <aside id="sidebar" class="sidebar-transition sidebar-expanded fixed top-0 left-0 h-screen glass border-r border-rose-100 z-50 flex flex-col overflow-hidden">
-        
-        <div class="p-6 mb-6">
-            <div class="flex items-center space-x-4">
-                <div class="w-10 h-10 cherry-gradient rounded-xl flex-shrink-0 flex items-center justify-center shadow-lg shadow-rose-200">
-                    <i class="fas fa-heart-pulse text-white"></i>
+<body class="text-slate-900 overflow-x-hidden">
+
+    <aside id="sidebar"
+        class="sidebar-transition fixed top-0 left-0 h-screen bg-slate-50/80 backdrop-blur-xl border-r border-slate-200 z-50 flex flex-col">
+        <div class="p-6 mb-4">
+            <div class="flex items-center">
+                <div
+                    class="min-w-[40px] h-10 bg-rose-600 rounded-xl flex items-center justify-center shadow-lg shadow-rose-200">
+                    <i class="fas fa-heart-pulse text-white text-lg"></i>
                 </div>
-                <span class="sidebar-text font-black text-xl tracking-tighter text-rose-950 truncate transition-opacity duration-300">Mediwise</span>
+                <span class="sidebar-text ml-4 font-extrabold text-xl tracking-tight text-slate-800">Mediwise</span>
             </div>
         </div>
 
-        <nav class="flex-1 px-4 space-y-2">
-            <a href="#" class="flex items-center p-4 rounded-2xl bg-white text-rose-600 shadow-sm border border-rose-100 group">
-                <i class="fas fa-grid-2 text-lg w-6"></i>
-                <span class="sidebar-text ml-4 font-bold text-sm tracking-tight transition-opacity duration-300">Dashboard</span>
+        <nav class="flex-1 space-y-1 overflow-y-auto">
+            <a href="#" class="nav-item active-link group">
+                <div class="min-w-[40px] flex justify-center">
+                    <i class="fas fa-chart-pie text-lg"></i>
+                </div>
+                <span class="sidebar-text ml-3 font-semibold text-sm">Dashboard</span>
             </a>
-            <a href="#" class="flex items-center p-4 rounded-2xl text-slate-500 hover:bg-rose-50 hover:text-rose-600 transition-all group">
-                <i class="fas fa-user-group text-lg w-6"></i>
-                <span class="sidebar-text ml-4 font-bold text-sm tracking-tight transition-opacity duration-300">Patients</span>
+
+            <a href="#" class="nav-item text-slate-500 hover:bg-white hover:text-slate-900 transition-all group">
+                <div class="min-w-[40px] flex justify-center">
+                    <i class="fas fa-id-card-clip text-lg"></i>
+                </div>
+                <span class="sidebar-text ml-3 font-semibold text-sm">Patient Registry</span>
             </a>
-            <a href="#" class="flex items-center p-4 rounded-2xl text-slate-500 hover:bg-rose-50 hover:text-rose-600 transition-all group">
-                <i class="fas fa-file-invoice-dollar text-lg w-6"></i>
-                <span class="sidebar-text ml-4 font-bold text-sm tracking-tight transition-opacity duration-300">Billing</span>
+
+            <a href="{% url 'manage_doctors' %}"
+                class="nav-item text-slate-500 hover:bg-white hover:text-slate-900 transition-all group">
+                <div class="min-w-[40px] flex justify-center">
+                    <div class="relative">
+                        <i class="fas fa-user-md text-lg"></i>
+                        <i class="fas fa-plus-circle absolute -top-1 -right-1 text-[10px] text-rose-600"></i>
+                    </div>
+                </div>
+                <span class="sidebar-text ml-3 font-semibold text-sm">Manage Doctors</span>
             </a>
-            <a href="#" class="flex items-center p-4 rounded-2xl text-slate-500 hover:bg-rose-50 hover:text-rose-600 transition-all group">
-                <i class="fas fa-chart-pie text-lg w-6"></i>
-                <span class="sidebar-text ml-4 font-bold text-sm tracking-tight transition-opacity duration-300">Analytics</span>
+
+            <a href="{% url 'admin_profile' %}"
+                class="nav-item text-slate-500 hover:bg-white hover:text-slate-900 transition-all group">
+                <div class="min-w-[40px] flex justify-center">
+                    <i class="fas fa-gear text-lg"></i>
+                </div>
+                <span class="sidebar-text ml-3 font-semibold text-sm">Settings</span>
             </a>
         </nav>
 
-        <div class="p-4 border-t border-rose-100">
-            <button id="toggle-btn" class="w-full flex items-center p-4 rounded-2xl text-slate-400 hover:bg-slate-100 transition-all group mb-2">
-                <i class="fas fa-right-left text-lg w-6"></i>
-                <span class="sidebar-text ml-4 font-bold text-xs uppercase tracking-widest transition-opacity duration-300">Collapse</span>
+        <div class="p-3 border-t border-slate-200 bg-slate-100/50 space-y-1">
+            <button id="toggle-btn"
+                class="w-full flex items-center p-3 rounded-xl text-slate-400 hover:text-slate-900 transition-all">
+                <div class="min-w-[40px] flex justify-center">
+                    <i class="fas fa-chevron-left sidebar-transition" id="toggle-icon"></i>
+                </div>
+                <span class="sidebar-text ml-3 font-bold text-xs uppercase tracking-widest">Collapse</span>
             </button>
-            <a href="{% url 'logout' %}" class="flex items-center p-4 rounded-2xl text-rose-600 hover:bg-rose-100 transition-all group">
-                <i class="fas fa-sign-out-alt text-lg w-6"></i>
-                <span class="sidebar-text ml-4 font-bold text-sm transition-opacity duration-300">Logout</span>
+
+            <a href="{% url 'logout' %}"
+                class="flex items-center p-3 rounded-xl text-rose-600 hover:bg-rose-50 transition-all">
+                <div class="min-w-[40px] flex justify-center">
+                    <i class="fas fa-right-from-bracket text-lg"></i>
+                </div>
+                <span class="sidebar-text ml-3 font-semibold text-sm">Sign Out</span>
             </a>
         </div>
     </aside>
 
-    <main id="main-content" class="content-transition ml-[260px] p-8">
-        
-        <header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-10">
+    <main id="main-content" class="sidebar-transition ml-[280px] p-8 lg:p-12 min-h-screen">
+
+        <header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12 animate-up">
             <div>
-                <h1 class="text-3xl font-black text-rose-950 tracking-tighter">Admin Overview</h1>
-                <p class="text-slate-500 text-sm font-medium">Monitoring system health and patient inflow.</p>
+                <h1 class="text-4xl font-extrabold text-slate-900 tracking-tight">System <span
+                        class="text-rose-600">Core</span></h1>
+                <p class="text-slate-500 font-medium mt-1">Hospital metrics and administrative controls</p>
             </div>
-            
-            <div class="flex items-center space-x-3 bg-white p-2 rounded-[1.5rem] shadow-sm border border-rose-100">
-                <div class="relative group">
-                    <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-rose-300"></i>
-                    <input type="text" placeholder="Search records..." class="pl-12 pr-4 py-2 bg-rose-50/50 rounded-xl outline-none focus:ring-2 focus:ring-rose-200 text-sm font-medium w-64">
+
+            <div class="flex items-center gap-6">
+                <div class="relative hidden lg:block">
+                    <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-300"></i>
+                    <input type="text" placeholder="Search database..."
+                        class="bg-white border border-slate-100 pl-12 pr-4 py-3 rounded-2xl w-64 focus:outline-none focus:ring-2 focus:ring-rose-500/20 transition-all shadow-sm">
                 </div>
-                <button class="w-10 h-10 rounded-xl hover:bg-rose-50 text-rose-600 transition-colors relative">
+                <div
+                    class="w-12 h-12 rounded-2xl bg-slate-900 flex items-center justify-center text-white shadow-xl shadow-slate-200 cursor-pointer hover:scale-105 transition-transform">
                     <i class="fas fa-bell"></i>
-                    <span class="absolute top-2 right-2 w-2 h-2 bg-rose-500 rounded-full border-2 border-white"></span>
-                </button>
+                </div>
             </div>
         </header>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-            <div class="glass p-6 rounded-[2.5rem] bento-card">
-                <div class="flex justify-between items-start mb-4">
-                    <div class="w-12 h-12 bg-rose-100 rounded-2xl flex items-center justify-center text-rose-600">
-                        <i class="fas fa-hospital-user text-xl"></i>
-                    </div>
-                    <span class="text-[10px] font-black text-emerald-600 bg-emerald-50 px-2 py-1 rounded-lg uppercase tracking-widest">+12%</span>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+            <div class="glass-card p-8 rounded-[2.5rem] shadow-sm animate-up" style="animation-delay: 0.1s">
+                <div class="w-12 h-12 bg-rose-600 text-white rounded-2xl flex items-center justify-center mb-6">
+                    <i class="fas fa-hospital-user text-xl"></i>
                 </div>
-                <h3 class="text-3xl font-black text-rose-950">2,842</h3>
-                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Total Patients</p>
+                <p class="text-slate-400 text-xs font-bold uppercase tracking-widest mb-1">Total Admissions</p>
+                <h2 class="text-4xl font-black text-slate-900">12,840</h2>
             </div>
 
-            <div class="glass p-6 rounded-[2.5rem] bento-card">
-                <div class="flex justify-between items-start mb-4">
-                    <div class="w-12 h-12 bg-purple-100 rounded-2xl flex items-center justify-center text-purple-600">
-                        <i class="fas fa-user-doctor text-xl"></i>
-                    </div>
-                    <span class="text-[10px] font-black text-slate-400 bg-slate-100 px-2 py-1 rounded-lg uppercase tracking-widest">Stable</span>
+            <div class="glass-card p-8 rounded-[2.5rem] shadow-sm animate-up" style="animation-delay: 0.2s">
+                <div class="w-12 h-12 bg-blue-600 text-white rounded-2xl flex items-center justify-center mb-6">
+                    <i class="fas fa-clock-rotate-left text-xl"></i>
                 </div>
-                <h3 class="text-3xl font-black text-rose-950">42</h3>
-                <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Active Staff</p>
+                <p class="text-slate-400 text-xs font-bold uppercase tracking-widest mb-1">Pending Invoices</p>
+                <h2 class="text-4xl font-black text-slate-900">42</h2>
             </div>
 
-            <div class="cherry-gradient p-6 rounded-[2.5rem] bento-card text-white shadow-xl shadow-rose-200">
-                <div class="flex justify-between items-start mb-4">
-                    <div class="w-12 h-12 bg-white/20 backdrop-blur-md rounded-2xl flex items-center justify-center">
-                        <i class="fas fa-calendar-check text-xl"></i>
-                    </div>
-                    <i class="fas fa-ellipsis-h opacity-50"></i>
+            <a href="#"
+                class="bg-gradient-to-br from-rose-500 to-pink-600 p-8 rounded-[2.5rem] shadow-xl shadow-rose-200 flex flex-col items-center justify-center text-center text-white hover:scale-[1.02] transition-all group animate-up"
+                style="animation-delay: 0.3s">
+                <div
+                    class="w-14 h-14 bg-white/20 rounded-full flex items-center justify-center mb-4 group-hover:rotate-90 transition-transform">
+                    <i class="fas fa-plus text-xl"></i>
                 </div>
-                <h3 class="text-3xl font-black">38</h3>
-                <p class="text-xs font-bold text-rose-100 uppercase tracking-widest">Today's Appointments</p>
-            </div>
-
-            <div class="bg-slate-900 p-6 rounded-[2.5rem] bento-card text-white">
-                <div class="flex justify-between items-start mb-4">
-                    <div class="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center text-rose-400">
-                        <i class="fas fa-vault text-xl"></i>
-                    </div>
-                </div>
-                <h3 class="text-3xl font-black">99.9%</h3>
-                <p class="text-xs font-bold text-slate-500 uppercase tracking-widest">Security Health</p>
-            </div>
+                <span class="font-bold text-lg">Add New Record</span>
+            </a>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            
-            <div class="lg:col-span-2 bg-white rounded-[3rem] p-8 border border-rose-50 shadow-sm">
-                <div class="flex justify-between items-center mb-8">
-                    <h3 class="text-xl font-black text-rose-950 tracking-tight">Recent Patient Intake</h3>
-                    <button class="text-xs font-black text-rose-600 uppercase tracking-widest hover:underline">Export CSV</button>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left">
-                        <thead>
-                            <tr class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] border-b border-rose-50">
-                                <th class="pb-4">Patient</th>
-                                <th class="pb-4">Status</th>
-                                <th class="pb-4">Doctor</th>
-                                <th class="pb-4 text-right">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-rose-50">
-                            <tr class="group">
-                                <td class="py-5">
-                                    <div class="flex items-center space-x-3">
-                                        <div class="w-10 h-10 rounded-xl bg-rose-50 flex items-center justify-center font-bold text-rose-600">JD</div>
-                                        <div>
-                                            <p class="text-sm font-black text-rose-950">John Doe</p>
-                                            <p class="text-[10px] font-bold text-slate-400 uppercase">#88210</p>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="py-5">
-                                    <span class="px-3 py-1 bg-emerald-50 text-emerald-600 rounded-full text-[10px] font-black uppercase">Confirmed</span>
-                                </td>
-                                <td class="py-5 text-sm font-bold text-slate-600">Dr. Sarah Smith</td>
-                                <td class="py-5 text-right">
-                                    <button class="w-8 h-8 rounded-lg hover:bg-rose-50 text-slate-400 hover:text-rose-600 transition-colors">
-                                        <i class="fas fa-ellipsis-vertical"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+        <div class="bg-white border border-slate-100 rounded-[2.5rem] p-8 shadow-sm animate-up"
+            style="animation-delay: 0.4s">
+            <div class="flex justify-between items-center mb-8">
+                <h3 class="text-xl font-extrabold text-slate-800">Recent Appointments</h3>
+                <button class="text-rose-600 font-bold text-sm hover:underline">View All Registry</button>
             </div>
 
-            <div class="glass rounded-[3rem] p-8 flex flex-col">
-                <h3 class="text-xl font-black text-rose-950 tracking-tight mb-8">System Logs</h3>
-                <div class="space-y-6 flex-grow">
-                    <div class="flex space-x-4">
-                        <div class="w-1 bg-rose-500 rounded-full"></div>
-                        <div>
-                            <p class="text-sm font-bold text-rose-900">Emergency Protocol</p>
-                            <p class="text-[10px] text-slate-400 font-medium">09:15 AM • Server 04</p>
-                        </div>
-                    </div>
-                    <div class="flex space-x-4 opacity-50">
-                        <div class="w-1 bg-slate-300 rounded-full"></div>
-                        <div>
-                            <p class="text-sm font-bold text-slate-900">System Backup</p>
-                            <p class="text-[10px] text-slate-400 font-medium">Yesterday • Automated</p>
-                        </div>
-                    </div>
-                </div>
-                <button class="mt-8 py-4 bg-rose-50 rounded-2xl text-[10px] font-black text-rose-600 uppercase tracking-widest hover:bg-rose-100 transition-colors">
-                    View Audit Trail
-                </button>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead>
+                        <tr class="text-slate-400 text-xs uppercase tracking-widest border-b border-slate-50">
+                            <th class="pb-4 font-bold">Patient Name</th>
+                            <th class="pb-4 font-bold">Assigned Doctor</th>
+                            <th class="pb-4 font-bold">Date</th>
+                            <th class="pb-4 font-bold">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-sm font-medium text-slate-700">
+                        <tr class="border-b border-slate-50 hover:bg-slate-50/50 transition-colors">
+                            <td class="py-5 flex items-center gap-3">
+                                <div
+                                    class="w-8 h-8 rounded-lg bg-rose-100 text-rose-600 flex items-center justify-center text-xs font-bold">
+                                    JD</div>
+                                Jane Doe
+                            </td>
+                            <td class="py-5">Dr. Sarah Smith</td>
+                            <td class="py-5 text-slate-400">Oct 24, 2026</td>
+                            <td class="py-5"><span
+                                    class="px-3 py-1 bg-emerald-100 text-emerald-600 rounded-full text-[10px] font-bold uppercase">Confirmed</span>
+                            </td>
+                        </tr>
+                        <tr class="border-b border-slate-50 hover:bg-slate-50/50 transition-colors">
+                            <td class="py-5 flex items-center gap-3">
+                                <div
+                                    class="w-8 h-8 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold">
+                                    MK</div>
+                                Mark Kelvin
+                            </td>
+                            <td class="py-5">Dr. James Bond</td>
+                            <td class="py-5 text-slate-400">Oct 25, 2026</td>
+                            <td class="py-5"><span
+                                    class="px-3 py-1 bg-amber-100 text-amber-600 rounded-full text-[10px] font-bold uppercase">Pending</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
-
         </div>
     </main>
 
@@ -230,25 +271,39 @@
         const sidebar = document.getElementById('sidebar');
         const mainContent = document.getElementById('main-content');
         const toggleBtn = document.getElementById('toggle-btn');
-        const sidebarTexts = document.querySelectorAll('.sidebar-text');
+        const toggleIcon = document.getElementById('toggle-icon');
+        const navItems = document.querySelectorAll('.nav-item');
 
+
+        const sidebarTexts = document.querySelectorAll('.sidebar-text');
         let isExpanded = true;
 
+        // TOGGLE SIDEBAR
         toggleBtn.addEventListener('click', () => {
             isExpanded = !isExpanded;
-
             if (isExpanded) {
                 sidebar.classList.remove('sidebar-collapsed');
-                sidebar.classList.add('sidebar-expanded');
-                mainContent.classList.replace('ml-[88px]', 'ml-[260px]');
-                sidebarTexts.forEach(el => el.style.opacity = '1');
+                mainContent.classList.remove('main-collapsed');
+                toggleIcon.style.transform = 'rotate(0deg)';
+
+                setTimeout(() => {
+                    sidebarTexts.forEach(t => {
+                        t.style.opacity = '1';
+                        t.style.display = 'inline';
+                    });
+                }, 150);
             } else {
-                sidebar.classList.remove('sidebar-expanded');
                 sidebar.classList.add('sidebar-collapsed');
-                mainContent.classList.replace('ml-[260px]', 'ml-[88px]');
-                sidebarTexts.forEach(el => el.style.opacity = '0');
+                mainContent.classList.add('main-collapsed');
+                toggleIcon.style.transform = 'rotate(180deg)';
+
+                sidebarTexts.forEach(t => {
+                    t.style.opacity = '0';
+                    setTimeout(() => t.style.display = 'none', 200);
+                });
             }
         });
     </script>
 </body>
+
 </html>

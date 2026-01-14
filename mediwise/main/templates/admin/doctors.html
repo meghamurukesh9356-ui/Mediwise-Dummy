@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <title>Mediwise | Doctor Registry</title>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #fcfcfd;
+            background-image: radial-gradient(#e5e7eb 0.5px, transparent 0.5px);
+            background-size: 24px 24px;
+        }
+
+        /* Sidebar & Layout Styles (Synced with Dashboard) */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #fda4af;
+            border-radius: 10px;
+        }
+
+        .sidebar-transition {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        #sidebar {
+            width: 280px;
+        }
+
+        .sidebar-collapsed {
+            width: 88px !important;
+        }
+
+        .main-collapsed {
+            margin-left: 88px !important;
+        }
+
+        .nav-item {
+            margin: 4px 12px;
+            border-radius: 14px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            padding: 12px;
+        }
+
+        .active-link {
+            background-color: #ffffff;
+            color: #be123c;
+            box-shadow: 0 10px 15px -3px rgba(225, 29, 72, 0.1);
+            border: 1px solid rgba(225, 29, 72, 0.1);
+        }
+
+        .sidebar-text {
+            transition: opacity 0.2s ease;
+            white-space: nowrap;
+        }
+
+        /* Glass Card */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(244, 63, 94, 0.1);
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-up {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .modal-animate {
+            animation: scaleIn 0.2s ease-out forwards;
+        }
+    </style>
+</head>
+
+<body class="text-slate-900 overflow-x-hidden">
+
+    <!-- Sidebar -->
+    <aside id="sidebar"
+        class="sidebar-transition fixed top-0 left-0 h-screen bg-slate-50/80 backdrop-blur-xl border-r border-slate-200 z-50 flex flex-col">
+        <div class="p-6 mb-4">
+            <div class="flex items-center">
+                <div
+                    class="min-w-[40px] h-10 bg-rose-600 rounded-xl flex items-center justify-center shadow-lg shadow-rose-200">
+                    <i class="fas fa-heart-pulse text-white text-lg"></i>
+                </div>
+                <span class="sidebar-text ml-4 font-extrabold text-xl tracking-tight text-slate-800">Mediwise</span>
+            </div>
+        </div>
+
+        <nav class="flex-1 space-y-1 overflow-y-auto">
+            <a href="{% url 'admin_dashboard' %}"
+                class="nav-item text-slate-500 hover:bg-white hover:text-slate-900 transition-all group">
+                <div class="min-w-[40px] flex justify-center">
+                    <i class="fas fa-chart-pie text-lg"></i>
+                </div>
+                <span class="sidebar-text ml-3 font-semibold text-sm">Dashboard</span>
+            </a>
+
+            <a href="#" class="nav-item text-slate-500 hover:bg-white hover:text-slate-900 transition-all group">
+                <div class="min-w-[40px] flex justify-center">
+                    <i class="fas fa-id-card-clip text-lg"></i>
+                </div>
+                <span class="sidebar-text ml-3 font-semibold text-sm">Patient Registry</span>
+            </a>
+
+            <a href="{% url 'manage_doctors' %}" class="nav-item active-link group">
+                <div class="min-w-[40px] flex justify-center">
+                    <div class="relative">
+                        <i class="fas fa-user-md text-lg"></i>
+                        <i class="fas fa-plus-circle absolute -top-1 -right-1 text-[10px] text-rose-600"></i>
+                    </div>
+                </div>
+                <span class="sidebar-text ml-3 font-semibold text-sm">Manage Doctors</span>
+            </a>
+
+            <a href="{% url 'admin_profile' %}"
+                class="nav-item text-slate-500 hover:bg-white hover:text-slate-900 transition-all group">
+                <div class="min-w-[40px] flex justify-center">
+                    <i class="fas fa-gear text-lg"></i>
+                </div>
+                <span class="sidebar-text ml-3 font-semibold text-sm">Settings</span>
+            </a>
+        </nav>
+
+        <div class="p-3 border-t border-slate-200 bg-slate-100/50 space-y-1">
+            <button id="toggle-btn"
+                class="w-full flex items-center p-3 rounded-xl text-slate-400 hover:text-slate-900 transition-all">
+                <div class="min-w-[40px] flex justify-center">
+                    <i class="fas fa-chevron-left sidebar-transition" id="toggle-icon"></i>
+                </div>
+                <span class="sidebar-text ml-3 font-bold text-xs uppercase tracking-widest">Collapse</span>
+            </button>
+            <a href="{% url 'logout' %}"
+                class="flex items-center p-3 rounded-xl text-rose-600 hover:bg-rose-50 transition-all">
+                <div class="min-w-[40px] flex justify-center">
+                    <i class="fas fa-right-from-bracket text-lg"></i>
+                </div>
+                <span class="sidebar-text ml-3 font-semibold text-sm">Sign Out</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main id="main-content" class="sidebar-transition ml-[280px] p-8 lg:p-12 min-h-screen">
+
+        <!-- Header -->
+        <header class="flex justify-between items-center mb-10 animate-up">
+            <div>
+                <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Medical <span
+                        class="text-rose-600">Staff</span></h1>
+                <p class="text-slate-500 font-medium mt-1">Manage hospital doctors and specialists</p>
+            </div>
+            <button onclick="openModal('addModal')"
+                class="bg-slate-900 text-white px-6 py-3 rounded-xl font-bold text-sm hover:bg-rose-600 hover:-translate-y-1 transition-all shadow-xl shadow-slate-200 flex items-center gap-3">
+                <i class="fas fa-plus"></i>
+                Add New Doctor
+            </button>
+        </header>
+
+        <!-- Messages -->
+        {% if messages %}
+        <div class="mb-8 animate-up" style="animation-delay: 0.1s;">
+            {% for message in messages %}
+            <div class="message-item p-4 rounded-xl flex items-center gap-3 text-sm font-bold transition-opacity duration-500
+                {% if message.tags == 'success' %}bg-emerald-50 text-emerald-600 border border-emerald-100 msg-success
+                {% else %}bg-rose-50 text-rose-600 border border-rose-100{% endif %}">
+                <i
+                    class="fas {% if message.tags == 'success' %}fa-check-circle{% else %}fa-exclamation-circle{% endif %}"></i>
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Doctors List -->
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+            {% for doctor in doctors %}
+            <div class="glass-card p-6 rounded-3xl hover:shadow-lg transition-all animate-up group relative overflow-hidden"
+                style="animation-delay: 0.{{ forloop.counter }}s">
+
+                <!-- Quick Actions -->
+                <div
+                    class="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity translate-x-4 group-hover:translate-x-0 duration-300">
+                    <button
+                        onclick="openEditModal('{{ doctor.id }}', '{{ doctor.first_name }}', '{{ doctor.last_name }}', '{{ doctor.email }}', '{{ doctor.phone_number }}', '{{ doctor.speciality }}', '{{ doctor.qualification }}')"
+                        class="w-8 h-8 rounded-full bg-slate-100 text-slate-600 hover:bg-blue-50 hover:text-blue-600 flex items-center justify-center transition-colors">
+                        <i class="fas fa-pen text-xs"></i>
+                    </button>
+                    <button onclick="confirmDelete('{{ doctor.id }}')"
+                        class="w-8 h-8 rounded-full bg-slate-100 text-slate-600 hover:bg-rose-50 hover:text-rose-600 flex items-center justify-center transition-colors">
+                        <i class="fas fa-trash text-xs"></i>
+                    </button>
+                </div>
+
+                <div class="flex items-center gap-4 mb-4">
+                    <div
+                        class="w-16 h-16 rounded-2xl bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center text-slate-400 font-bold text-xl">
+                        {% if doctor.profile_picture %}
+                        <img src="{{ doctor.profile_picture.url }}" class="w-full h-full object-cover rounded-2xl">
+                        {% else %}
+                        {{ doctor.first_name|slice:":1" }}{{ doctor.last_name|slice:":1" }}
+                        {% endif %}
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-lg text-slate-800">{{ doctor.first_name }} {{ doctor.last_name }}</h3>
+                        <p class="text-rose-600 text-xs font-bold uppercase tracking-wider">{{ doctor.speciality }}</p>
+                    </div>
+                </div>
+
+                <div class="space-y-2 text-sm text-slate-500 font-medium">
+                    <div class="flex items-center gap-3">
+                        <i class="fas fa-envelope w-4 text-center text-slate-300"></i>
+                        {{ doctor.email }}
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <i class="fas fa-phone w-4 text-center text-slate-300"></i>
+                        {{ doctor.phone_number }}
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <i class="fas fa-graduation-cap w-4 text-center text-slate-300"></i>
+                        <span>{{ doctor.qualification }}</span>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-span-full py-12 text-center text-slate-400">
+                <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-user-doctor text-2xl"></i>
+                </div>
+                <p>No doctors found in rule system.</p>
+            </div>
+            {% endfor %}
+        </div>
+
+    </main>
+
+    <!-- Add Doctor Modal -->
+    <div id="addModal" class="fixed inset-0 z-[100] hidden">
+        <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity"
+            onclick="closeModal('addModal')"></div>
+        <div
+            class="absolute right-0 top-0 h-full w-full max-w-2xl bg-white shadow-2xl p-8 overflow-y-auto modal-animate">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="text-2xl font-extrabold text-slate-800">Add Doctor</h2>
+                <button onclick="closeModal('addModal')"
+                    class="w-8 h-8 rounded-full bg-slate-50 text-slate-400 hover:bg-rose-50 hover:text-rose-600 flex items-center justify-center transition-colors">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="add">
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="col-span-full">
+                        <div class="flex items-center gap-4 p-4 bg-rose-50 rounded-2xl mb-2">
+                            <div
+                                class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-rose-600 shadow-sm">
+                                <i class="fas fa-user-doctor"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-rose-900 text-sm">Professional Profile</h3>
+                                <p class="text-xs text-rose-700/70">Enter the doctor's key details below</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">First
+                            Name</label>
+                        <div class="relative">
+                            <i class="fas fa-user absolute left-4 top-1/2 -translate-y-1/2 text-slate-300"></i>
+                            {{ form.first_name }}
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Last
+                            Name</label>
+                        <div class="relative">
+                            <i class="fas fa-user absolute left-4 top-1/2 -translate-y-1/2 text-slate-300"></i>
+                            {{ form.last_name }}
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Primary
+                            Email</label>
+                        <div class="relative">
+                            <i class="fas fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-slate-300"></i>
+                            {{ form.email }}
+                        </div>
+                    </div>
+                    <div>
+                        <label
+                            class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Phone</label>
+                        <div class="relative">
+                            <i class="fas fa-phone absolute left-4 top-1/2 -translate-y-1/2 text-slate-300"></i>
+                            {{ form.phone_number }}
+                        </div>
+                    </div>
+
+                    <div>
+                        <label
+                            class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Specialty</label>
+                        <div class="relative">
+                            <i class="fas fa-stethoscope absolute left-4 top-1/2 -translate-y-1/2 text-slate-300"></i>
+                            {{ form.speciality }}
+                        </div>
+                    </div>
+                    <div>
+                        <label
+                            class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Qualification</label>
+                        <div class="relative">
+                            <i
+                                class="fas fa-graduation-cap absolute left-4 top-1/2 -translate-y-1/2 text-slate-300"></i>
+                            {{ form.qualification }}
+                        </div>
+                    </div>
+
+                    <div class="col-span-full">
+                        <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Secure
+                            Password</label>
+                        <div class="relative">
+                            <i class="fas fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-slate-300"></i>
+                            {{ form.password }}
+                        </div>
+                        <p class="text-[10px] text-slate-400 mt-2 ml-1">Must be at least 8 characters long.</p>
+                    </div>
+                </div>
+
+                <div class="mt-8 pt-8 border-t border-slate-100">
+                    <button type="submit"
+                        class="w-full py-4 bg-slate-900 text-white rounded-xl font-bold hover:bg-rose-600 transition-colors shadow-lg shadow-slate-200 flex items-center justify-center gap-2">
+                        <i class="fas fa-check-circle"></i>
+                        Register New Doctor
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Doctor Modal -->
+    <div id="editModal" class="fixed inset-0 z-[100] hidden">
+        <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onclick="closeModal('editModal')"></div>
+        <div
+            class="absolute right-0 top-0 h-full w-full max-w-2xl bg-white shadow-2xl p-8 overflow-y-auto modal-animate">
+            <h2 class="text-2xl font-extrabold text-slate-800 mb-8">Edit Doctor</h2>
+
+            <form method="POST" id="editForm">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="edit">
+                <input type="hidden" name="doctor_id" id="edit_doctor_id">
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">First
+                            Name</label>
+                        <div class="relative">
+                            <i class="fas fa-user absolute left-4 top-1/2 -translate-y-1/2 text-slate-300"></i>
+                            <input type="text" name="first_name" id="edit_first_name"
+                                class="w-full p-4 pl-12 bg-slate-50 rounded-xl border-none focus:ring-2 focus:ring-rose-500/20"
+                                required>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Last
+                            Name</label>
+                        <div class="relative">
+                            <i class="fas fa-user absolute left-4 top-1/2 -translate-y-1/2 text-slate-300"></i>
+                            <input type="text" name="last_name" id="edit_last_name"
+                                class="w-full p-4 pl-12 bg-slate-50 rounded-xl border-none focus:ring-2 focus:ring-rose-500/20"
+                                required>
+                        </div>
+                    </div>
+                    <div>
+                        <label
+                            class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Email</label>
+                        <div class="relative">
+                            <i class="fas fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-slate-300"></i>
+                            <input type="email" name="email" id="edit_email"
+                                class="w-full p-4 pl-12 bg-slate-50 rounded-xl border-none focus:ring-2 focus:ring-rose-500/20"
+                                required>
+                        </div>
+                    </div>
+                    <div>
+                        <label
+                            class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Phone</label>
+                        <div class="relative">
+                            <i class="fas fa-phone absolute left-4 top-1/2 -translate-y-1/2 text-slate-300"></i>
+                            <input type="text" name="phone_number" id="edit_phone"
+                                class="w-full p-4 pl-12 bg-slate-50 rounded-xl border-none focus:ring-2 focus:ring-rose-500/20"
+                                required>
+                        </div>
+                    </div>
+                    <div>
+                        <label
+                            class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Specialty</label>
+                        <div class="relative">
+                            <i class="fas fa-stethoscope absolute left-4 top-1/2 -translate-y-1/2 text-slate-300"></i>
+                            <input type="text" name="speciality" id="edit_speciality"
+                                class="w-full p-4 pl-12 bg-slate-50 rounded-xl border-none focus:ring-2 focus:ring-rose-500/20"
+                                required>
+                        </div>
+                    </div>
+                    <div>
+                        <label
+                            class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Qualification</label>
+                        <div class="relative">
+                            <i
+                                class="fas fa-graduation-cap absolute left-4 top-1/2 -translate-y-1/2 text-slate-300"></i>
+                            <input type="text" name="qualification" id="edit_qualification"
+                                class="w-full p-4 pl-12 bg-slate-50 rounded-xl border-none focus:ring-2 focus:ring-rose-500/20"
+                                required>
+                        </div>
+                    </div>
+                    <div class="col-span-full">
+                        <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">New
+                            Password (Optional)</label>
+                        <div class="relative">
+                            <i class="fas fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-slate-300"></i>
+                            <input type="password" name="password" 
+                                class="w-full p-4 pl-12 bg-slate-50 rounded-xl border-none focus:ring-2 focus:ring-rose-500/20"
+                                placeholder="Leave blank to keep current password">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-8 pt-8 border-t border-slate-100 flex gap-4">
+                    <button type="button" onclick="closeModal('editModal')"
+                        class="flex-1 py-4 bg-slate-100 text-slate-500 rounded-xl font-bold hover:bg-slate-200 transition-colors">Cancel</button>
+                    <button type="submit"
+                        class="flex-1 py-4 bg-slate-900 text-white rounded-xl font-bold hover:bg-rose-600 transition-colors shadow-lg">Save
+                        Updates</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="closeModal('deleteModal')"></div>
+        <div class="bg-white rounded-3xl p-8 max-w-sm w-full relative z-10 modal-animate text-center">
+            <div
+                class="w-16 h-16 bg-rose-50 text-rose-600 rounded-full flex items-center justify-center mx-auto mb-6 text-2xl">
+                <i class="fas fa-trash-alt"></i>
+            </div>
+            <h3 class="text-xl font-extrabold text-slate-800 mb-2">Delete Doctor?</h3>
+            <p class="text-slate-500 text-sm mb-8">This action cannot be undone. The doctor's access and profile will be
+                permanently removed.</p>
+
+            <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="delete">
+                <input type="hidden" name="doctor_id" id="delete_doctor_id">
+
+                <div class="flex gap-3">
+                    <button type="button" onclick="closeModal('deleteModal')"
+                        class="flex-1 py-3 bg-slate-100 text-slate-600 rounded-xl font-bold hover:bg-slate-200 transition-colors">Cancel</button>
+                    <button type="submit"
+                        class="flex-1 py-3 bg-rose-600 text-white rounded-xl font-bold hover:bg-rose-700 transition-colors shadow-lg shadow-rose-200">Delete</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Message Auto-Fade Logic
+        document.addEventListener('DOMContentLoaded', () => {
+            const messages = document.querySelectorAll('.message-item');
+            messages.forEach(msg => {
+                // If it's a SUCCESS message (green), fade it out
+                if (msg.classList.contains('msg-success')) {
+                    setTimeout(() => {
+                        msg.style.opacity = '0';
+                        setTimeout(() => msg.remove(), 500);
+                    }, 4000); // 4 seconds delay
+                }
+                // ERROR messages stay until refreshed or manually removed (if we added a close btn)
+            });
+        });
+
+        // Modal Logic
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.remove('hidden');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+        }
+
+        function openEditModal(id, first, last, email, phone, special, qual) {
+            document.getElementById('edit_doctor_id').value = id;
+            document.getElementById('edit_first_name').value = first;
+            document.getElementById('edit_last_name').value = last;
+            document.getElementById('edit_email').value = email;
+            document.getElementById('edit_phone').value = phone;
+            document.getElementById('edit_speciality').value = special;
+            document.getElementById('edit_qualification').value = qual;
+            openModal('editModal');
+        }
+
+        function confirmDelete(id) {
+            document.getElementById('delete_doctor_id').value = id;
+            openModal('deleteModal');
+        }
+
+        // Sidebar Toggle Logic (Same as Dashboard)
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('main-content');
+        const toggleBtn = document.getElementById('toggle-btn');
+        const toggleIcon = document.getElementById('toggle-icon');
+        const sidebarTexts = document.querySelectorAll('.sidebar-text');
+        let isExpanded = true;
+
+        toggleBtn.addEventListener('click', () => {
+            isExpanded = !isExpanded;
+            if (isExpanded) {
+                sidebar.classList.remove('sidebar-collapsed');
+                mainContent.classList.remove('main-collapsed');
+                toggleIcon.style.transform = 'rotate(0deg)';
+                setTimeout(() => sidebarTexts.forEach(t => { t.style.opacity = '1'; t.style.display = 'inline'; }), 150);
+            } else {
+                sidebar.classList.add('sidebar-collapsed');
+                mainContent.classList.add('main-collapsed');
+                toggleIcon.style.transform = 'rotate(180deg)';
+                sidebarTexts.forEach(t => { t.style.opacity = '0'; setTimeout(() => t.style.display = 'none', 200); });
+            }
+        });
+
+        // Styling injection for form widgets (Adding padding for icons)
+        // We targeted specific inputs in HTML above, but this handles any residual ones
+        document.querySelectorAll('form input, form select, form textarea').forEach(input => {
+            if (!input.classList.contains('form-control') && input.type !== 'hidden') {
+                input.classList.add('w-full', 'p-4', 'pl-12', 'bg-slate-50', 'rounded-xl', 'border-none', 'focus:ring-2', 'focus:ring-rose-500/20', 'outline-none', 'transition-all');
+            }
+        });
+    </script>
+</body>
+
+</html>

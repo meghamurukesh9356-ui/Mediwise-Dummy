@@ -1,160 +1,475 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <title>Mediwise | Register</title>
+    <title>Mediwise | Create Account</title>
     <style>
-        * { scrollbar-width: none; -ms-overflow-style: none; }
-        *::-webkit-scrollbar { display: none; }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
         body {
-            background-color: #fff1f2;
-            background-image: 
-                radial-gradient(at 0% 0%, rgba(251, 113, 133, 0.15) 0, transparent 50%), 
-                radial-gradient(at 100% 100%, rgba(190, 18, 60, 0.1) 0, transparent 50%);
-            overflow: hidden; height: 100vh; display: flex; align-items: center; justify-content: center;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #fdf2f8;
+            background-image:
+                radial-gradient(circle at 0% 0%, rgba(244, 63, 94, 0.08) 0, transparent 50%),
+                radial-gradient(circle at 100% 100%, rgba(244, 63, 94, 0.08) 0, transparent 50%),
+                linear-gradient(rgba(255, 255, 255, 0.4) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.4) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 20px 20px, 20px 20px;
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            overflow: hidden;
         }
-        .glass { background: rgba(255, 255, 255, 0.75); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.4); }
-        .cherry-gradient { background: linear-gradient(135deg, #be123c 0%, #fb7185 100%); }
-        .form-container { max-height: 65vh; overflow-y: auto; padding-right: 4px; }
-        .form-section { display: none; opacity: 0; transform: translateY(10px); transition: all 0.4s ease-out; }
-        .form-section.active { display: block; opacity: 1; transform: translateY(0); }
-        input, select {
-            width: 100%; padding: 0.75rem 1rem 0.75rem 2.75rem !important; border-radius: 1rem;
-            border: 1px solid #ffe4e6; background: rgba(255, 255, 255, 0.8); outline: none;
-            transition: all 0.2s; font-size: 0.875rem; appearance: none; height: 3rem;
+
+        .saas-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow:
+                0 20px 40px -10px rgba(225, 29, 72, 0.1),
+                0 0 15px rgba(255, 255, 255, 0.5) inset;
+            width: 95%;
+            max-width: 480px;
+            /* Default width for Patient/Selection */
+            border-radius: 2rem;
+            position: relative;
+            transition: max-width 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
         }
-        input:focus, select:focus { border-color: #fb7185; box-shadow: 0 0 0 4px rgba(251, 113, 133, 0.1); background: white; }
-        #success-overlay { display: none; backdrop-filter: blur(12px); background: rgba(255, 255, 255, 0.8); z-index: 999; }
+
+        /* "Book" modifier for expanded width */
+        .saas-card.wide-book {
+            max-width: 800px;
+        }
+
+        .form-section {
+            display: none;
+        }
+
+        .form-section.active {
+            display: block;
+            animation: fadeInScale 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.96) translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        /* Book Layout Split */
+        .book-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            position: relative;
+        }
+
+        .book-layout::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 1px;
+            background: linear-gradient(to bottom, transparent, rgba(244, 63, 94, 0.2), transparent);
+            transform: translateX(-50%);
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: #881337;
+            margin-bottom: 0.35rem;
+            margin-left: 0.25rem;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .field-icon {
+            position: absolute;
+            left: 1rem;
+            color: #f43f5e;
+            width: 1rem;
+            display: flex;
+            justify-content: center;
+            pointer-events: none;
+            font-size: 0.9rem;
+            z-index: 10;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 0.75rem 1rem 0.75rem 2.75rem !important;
+            border-radius: 1rem;
+            border: 1px solid #fecdd3;
+            background: #fff;
+            color: #4c0519;
+            font-size: 0.9rem;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            outline: none;
+            box-shadow: 0 2px 5px rgba(251, 113, 133, 0.05);
+        }
+
+        input:hover,
+        select:hover {
+            border-color: #fda4af;
+        }
+
+        input:focus,
+        select:focus {
+            background: #ffffff;
+            border-color: #f43f5e;
+            box-shadow: 0 0 0 4px rgba(244, 63, 94, 0.15);
+            transform: translateY(-1px);
+        }
+
+        .input-error {
+            border-color: #ef4444 !important;
+            background-color: #fef2f2 !important;
+        }
+
+        .input-error:focus {
+            box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.15);
+        }
+
+        .error-text {
+            color: #e11d48;
+            font-size: 0.65rem;
+            font-weight: 600;
+            margin-top: 0.35rem;
+            margin-left: 0.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .error-text::before {
+            content: '\f06a';
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+        }
+
+        .btn-cherry {
+            background: linear-gradient(135deg, #be123c, #9f1239);
+            color: white;
+            padding: 0.85rem;
+            border-radius: 1rem;
+            font-weight: 700;
+            transition: all 0.3s;
+            width: 100%;
+            font-size: 0.9rem;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 10px 20px -5px rgba(190, 18, 60, 0.4);
+        }
+
+        .btn-cherry:hover {
+            box-shadow: 0 15px 25px -5px rgba(190, 18, 60, 0.5);
+            transform: translateY(-2px);
+            background: linear-gradient(135deg, #e11d48, #be123c);
+        }
+
+        .btn-cherry:active {
+            transform: translateY(0);
+        }
+
+        #loading-overlay,
+        #success-modal {
+            display: none;
+            backdrop-filter: blur(8px);
+            background: rgba(255, 255, 255, 0.85);
+            z-index: 1000;
+            position: absolute;
+            inset: 0;
+            border-radius: 2rem;
+        }
+
+        .role-card {
+            border: 1px solid #ffe4e6;
+            background: #fff;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .role-card:hover {
+            border-color: #fca5a5;
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px -8px rgba(244, 63, 94, 0.25);
+        }
+
+        .role-card.selected {
+            border-color: #f43f5e;
+            background: #fff1f2;
+        }
+
+        /* Scrollbar aesthetics */
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #fda4af;
+            border-radius: 2px;
+        }
+
+        /* Responsive adjustments for book layout */
+        @media (max-width: 768px) {
+            .book-layout {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .book-layout::after {
+                display: none;
+            }
+
+            .saas-card.wide-book {
+                max-width: 95%;
+            }
+        }
     </style>
 </head>
+
 <body>
 
-    <div id="success-overlay" class="fixed inset-0 flex items-center justify-center">
-        <div class="bg-white p-10 rounded-[3rem] shadow-2xl text-center border border-rose-100 animate-bounce">
-            <div class="w-20 h-20 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                <i class="fas fa-check text-3xl"></i>
-            </div>
-            <h3 class="text-2xl font-black text-rose-950">Welcome to Mediwise!</h3>
-            <p class="text-slate-500 mt-2">Registration successful. Processing...</p>
-        </div>
+    <div id="error-tracker" data-patient-has-errors="{% if patient_form.errors %}true{% else %}false{% endif %}"
+        data-pharmacist-has-errors="{% if pharmacist_form.errors %}true{% else %}false{% endif %}"
+        data-registered="{{ registered|yesno:'true,false' }}" style="display: none;">
     </div>
 
-    <a href="/" class="fixed top-8 left-8 w-12 h-12 glass rounded-2xl flex items-center justify-center text-rose-600 hover:scale-110 transition-transform shadow-lg z-50">
-        <i class="fas fa-home"></i>
-    </a>
-
-    <div class="w-full max-w-xl glass rounded-[3rem] shadow-2xl shadow-rose-900/10 relative overflow-hidden">
-        <div class="pt-10 px-10 pb-6 text-center">
-            <div class="w-14 h-14 cherry-gradient rounded-2xl flex items-center justify-center shadow-lg shadow-rose-200 mx-auto mb-4">
-                <i class="fas fa-user-plus text-white text-xl"></i>
+    <div class="saas-card" id="main-card">
+        <div id="success-modal" class="flex flex-col items-center justify-center p-8 text-center">
+            <div
+                class="w-16 h-16 bg-gradient-to-br from-rose-100 to-rose-200 text-rose-600 rounded-full flex items-center justify-center mb-6 shadow-lg shadow-rose-100">
+                <i class="fas fa-check text-2xl"></i>
             </div>
-            <h2 class="text-3xl font-black text-rose-950 tracking-tight">Join Mediwise</h2>
-            <p id="role-subtitle" class="text-slate-400 text-sm font-medium mt-1">Select your role to continue</p>
+            <h3 class="text-2xl font-bold text-rose-950 mb-2">Success!</h3>
+            <p class="text-rose-600/80 font-medium text-sm">Your account is ready.</p>
+            <p class="text-rose-400 text-xs mt-1">Redirecting you shortly...</p>
         </div>
 
-        <div class="form-container px-10 pb-10">
+        <div id="loading-overlay" class="flex flex-col items-center justify-center">
+            <div class="animate-spin w-10 h-10 border-4 border-rose-600 border-t-transparent rounded-full mb-4"></div>
+            <p class="text-xs font-bold text-rose-900 uppercase tracking-widest">Processing</p>
+        </div>
+
+        <div class="p-8 text-center pb-2">
+            <div
+                class="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-br from-rose-600 to-rose-800 rounded-2xl mb-4 text-white shadow-lg shadow-rose-200 transform -rotate-3">
+                <i class="fas fa-plus-square text-xl"></i>
+            </div>
+            <h2 class="text-2xl font-extrabold text-rose-950 tracking-tight">Mediwise</h2>
+            <p id="role-subtitle" class="text-rose-500 font-medium text-sm mt-1">Select your account type</p>
+        </div>
+
+        <div class="p-8 pt-6">
             <div id="role-selection" class="form-section active">
-                <div class="grid grid-cols-2 gap-6 mb-8 mt-2">
-                    <div onclick="showForm('patient')" class="group p-6 rounded-3xl border border-rose-100 bg-white/50 hover:bg-rose-50 hover:border-rose-300 cursor-pointer transition-all text-center">
-                        <div class="w-12 h-12 bg-pink-100 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
-                            <i class="fas fa-user-injured text-pink-600 text-xl"></i>
+                <div class="grid grid-cols-2 gap-4 mb-8">
+                    <button onclick="showForm('patient')" class="role-card p-5 rounded-2xl text-left group">
+                        <div
+                            class="w-10 h-10 bg-rose-50 text-rose-600 rounded-xl flex items-center justify-center mb-3 group-hover:bg-rose-600 group-hover:text-white transition-all shadow-sm">
+                            <i class="fas fa-user-injured text-sm"></i>
                         </div>
-                        <span class="font-bold text-rose-950">Patient</span>
-                    </div>
-                    <div onclick="showForm('pharmacist')" class="group p-6 rounded-3xl border border-rose-100 bg-white/50 hover:bg-rose-50 hover:border-rose-300 cursor-pointer transition-all text-center">
-                        <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform">
-                            <i class="fas fa-pills text-purple-600 text-xl"></i>
+                        <h4 class="font-bold text-rose-950 text-sm mb-1">Patient</h4>
+                        <p class="text-[10px] text-rose-500 font-medium leading-relaxed">Book appointments & track your
+                            health history.</p>
+                    </button>
+                    <button onclick="showForm('pharmacist')" class="role-card p-5 rounded-2xl text-left group">
+                        <div
+                            class="w-10 h-10 bg-rose-50 text-rose-600 rounded-xl flex items-center justify-center mb-3 group-hover:bg-rose-600 group-hover:text-white transition-all shadow-sm">
+                            <i class="fas fa-pills text-sm"></i>
                         </div>
-                        <span class="font-bold text-rose-950">Pharmacist</span>
-                    </div>
+                        <h4 class="font-bold text-rose-950 text-sm mb-1">Pharmacist</h4>
+                        <p class="text-[10px] text-rose-500 font-medium leading-relaxed">Manage inventory & process
+                            prescriptions.</p>
+                    </button>
                 </div>
-                <p class="text-center text-sm text-slate-400">Already have an account? <a href="{% url 'login' %}" class="text-rose-600 font-bold hover:underline">Sign In</a></p>
+                <div class="text-center">
+                    <p class="text-sm text-gray-500">Already have an account? <a href="{% url 'login' %}"
+                            class="text-rose-700 font-bold hover:underline">Sign In</a></p>
+                </div>
             </div>
 
             <div id="patient-form" class="form-section">
-                <form method="POST" class="space-y-4" id="reg-patient-form">
+                <form method="POST" class="space-y-4">
                     {% csrf_token %}
                     <input type="hidden" name="role" value="patient">
+
                     <div class="grid grid-cols-2 gap-4">
-                        <div class="relative">
-                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">First Name</label>
-                            <i class="fas fa-user absolute left-4 bottom-4 text-rose-300 pointer-events-none"></i>
-                            {{ patient_form.first_name }}
+                        <div class="input-group">
+                            <label>First Name</label>
+                            <div class="input-wrapper">
+                                <span class="field-icon"><i class="fas fa-user"></i></span>
+                                {{ patient_form.first_name }}
+                            </div>
+                            {% if patient_form.first_name.errors %}<span class="error-text">
+                               {{ patient_form.first_name.errors.0 }}</span>{% endif %}
                         </div>
-                        <div class="relative">
-                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Last Name</label>
-                            <i class="fas fa-user absolute left-4 bottom-4 text-rose-300 pointer-events-none"></i>
-                            {{ patient_form.last_name }}
+                        <div class="input-group">
+                            <label>Last Name</label>
+                            <div class="input-wrapper">
+                                <span class="field-icon"><i class="fas fa-user"></i></span>
+                                {{ patient_form.last_name }}
+                            </div>
+                            {% if patient_form.last_name.errors %}<span class="error-text">
+                               {{ patient_form.last_name.errors.0 }}</span>{% endif %}
                         </div>
                     </div>
-                    <div class="relative">
-                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Gender</label>
-                        <div class="relative flex items-center">
-                            <i class="fas fa-venus-mars absolute left-4 text-rose-300 pointer-events-none"></i>
+
+                    <div class="input-group">
+                        <label>Gender</label>
+                        <div class="input-wrapper">
+                            <span class="field-icon"><i class="fas fa-venus-mars"></i></span>
                             {{ patient_form.gender }}
                         </div>
+                        {% if patient_form.gender.errors %}<span class="error-text">{{ patient_form.gender.errors.0 }}
+                        </span>{% endif %}
                     </div>
-                    <div class="relative">
-                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Email Address</label>
-                        <i class="fas fa-envelope absolute left-4 bottom-4 text-rose-300 pointer-events-none"></i>
-                        {{ patient_form.email }}
+
+                    <div class="input-group">
+                        <label>Email Address</label>
+                        <div class="input-wrapper">
+                            <span class="field-icon"><i class="fas fa-envelope"></i></span>
+                            {{ patient_form.email }}
+                        </div>
+                        {% if patient_form.email.errors %}<span class="error-text">{{ patient_form.email.errors.0 }}
+                        </span>{% endif %}
                     </div>
-                    <div class="relative">
-                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Password</label>
-                        <i class="fas fa-lock absolute left-4 bottom-4 text-rose-300 pointer-events-none"></i>
-                        {{ patient_form.password }}
+
+                    <div class="input-group">
+                        <label>Password</label>
+                        <div class="input-wrapper">
+                            <span class="field-icon"><i class="fas fa-lock"></i></span>
+                            {{ patient_form.password }}
+                        </div>
+                        {% if patient_form.password.errors %}<span class="error-text">{{ patient_form.password.errors.0 }}
+                            
+                        </span>{% endif %}
                     </div>
-                    <div class="flex gap-4 pt-4">
-                        <button type="button" onclick="showForm('selection')" class="flex-1 py-4 rounded-2xl font-bold text-rose-600 bg-rose-50 hover:bg-rose-100">Back</button>
-                        <button type="button" onclick="handleSubmit('reg-patient-form')" class="flex-[2] py-4 cherry-gradient text-white rounded-2xl font-black shadow-xl hover:scale-[1.02] transition-transform">Register</button>
+
+                    <div class="flex items-center gap-4 pt-4">
+                        <button type="button" onclick="showForm('selection')"
+                            class="w-auto px-2 text-xs font-bold text-gray-400 hover:text-rose-600 transition-colors uppercase tracking-wider">Back</button>
+                        <button type="submit" onclick="showLoading()" class="btn-cherry shadow-rose-200/50">Create
+                            Account</button>
                     </div>
                 </form>
             </div>
 
             <div id="pharmacist-form" class="form-section">
-                <form method="POST" class="space-y-4" id="reg-pharmacist-form">
+                <form method="POST" class="book-layout">
                     {% csrf_token %}
                     <input type="hidden" name="role" value="pharmacist">
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="relative">
-                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">First Name</label>
-                            <i class="fas fa-user absolute left-4 bottom-4 text-rose-300 pointer-events-none"></i>
-                            {{ pharmacist_form.first_name }}
+
+                    <!-- Left Page: Personal & Professional -->
+                    <div class="space-y-3">
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="input-group">
+                                <label>First Name</label>
+                                <div class="input-wrapper">
+                                    <span class="field-icon"><i class="fas fa-user"></i></span>
+                                    {{ pharmacist_form.first_name }}
+                                </div>
+                                {% if pharmacist_form.first_name.errors %}<span class="error-text">
+                                   {{ pharmacist_form.first_name.errors.0 }}</span>{% endif %}
+                            </div>
+                            <div class="input-group">
+                                <label>Last Name</label>
+                                <div class="input-wrapper">
+                                    <span class="field-icon"><i class="fas fa-user"></i></span>
+                                    {{ pharmacist_form.last_name }}
+                                </div>
+                                {% if pharmacist_form.last_name.errors %}<span class="error-text">
+                                   {{ pharmacist_form.last_name.errors.0 }}</span>{% endif %}
+                            </div>
                         </div>
-                        <div class="relative">
-                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Last Name</label>
-                            <i class="fas fa-user absolute left-4 bottom-4 text-rose-300 pointer-events-none"></i>
-                            {{ pharmacist_form.last_name }}
+
+                        <div class="input-group">
+                            <label>License No.</label>
+                            <div class="input-wrapper">
+                                <span class="field-icon"><i class="fas fa-id-card"></i></span>
+                                {{ pharmacist_form.license_number }}
+                            </div>
+                            {% if pharmacist_form.license_number.errors %}<span class="error-text">
+                               {{ pharmacist_form.license_number.errors.0 }}</span>{% endif %}
+                        </div>
+
+                        <div class="input-group">
+                            <label>Phone</label>
+                            <div class="input-wrapper">
+                                <span class="field-icon"><i class="fas fa-phone"></i></span>
+                                {{ pharmacist_form.phone_number }}
+                            </div>
+                            {% if pharmacist_form.phone_number.errors %}<span class="error-text">
+                              {{  pharmacist_form.phone_number.errors.0 }}</span>{% endif %}
+                        </div>
+
+                        <div class="input-group">
+                            <label>Pharmacy Address</label>
+                            <div class="input-wrapper">
+                                <span class="field-icon"><i class="fas fa-map-marker-alt"></i></span>
+                                {{ pharmacist_form.address }}
+                            </div>
+                            {% if pharmacist_form.address.errors %}<span class="error-text">
+                               {{ pharmacist_form.address.errors.0 }}</span>{% endif %}
                         </div>
                     </div>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="relative">
-                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">License No.</label>
-                            <i class="fas fa-id-card absolute left-4 bottom-4 text-rose-300 pointer-events-none"></i>
-                            {{ pharmacist_form.license_number }}
+
+                    <!-- Right Page: Account & Submit -->
+                    <div class="space-y-3 flex flex-col justify-between">
+                        <div>
+                            <div class="input-group mb-3">
+                                <label>Email</label>
+                                <div class="input-wrapper">
+                                    <span class="field-icon"><i class="fas fa-envelope"></i></span>
+                                    {{ pharmacist_form.email }}
+                                </div>
+                                {% if pharmacist_form.email.errors %}<span class="error-text">
+                                  {{  pharmacist_form.email.errors.0 }}</span>{% endif %}
+                            </div>
+
+                            <div class="input-group">
+                                <label>Password</label>
+                                <div class="input-wrapper">
+                                    <span class="field-icon"><i class="fas fa-lock"></i></span>
+                                    {{ pharmacist_form.password }}
+                                </div>
+                                {% if pharmacist_form.password.errors %}<span class="error-text">
+                                  {{ pharmacist_form.password.errors.0 }}</span>{% endif %}
+                            </div>
                         </div>
-                        <div class="relative">
-                            <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Phone</label>
-                            <i class="fas fa-phone absolute left-4 bottom-4 text-rose-300 pointer-events-none"></i>
-                            {{ pharmacist_form.phone_number }}
+
+                        <div class="flex items-center gap-4 pt-3 mt-auto">
+                            <button type="button" onclick="showForm('selection')"
+                                class="w-auto px-2 text-xs font-bold text-gray-400 hover:text-rose-600 transition-colors uppercase tracking-wider">Back</button>
+                            <button type="submit" onclick="showLoading()" class="btn-cherry shadow-rose-200/50">Register
+                                Pharmacy</button>
                         </div>
-                    </div>
-                    <div class="relative">
-                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Email</label>
-                        <i class="fas fa-envelope absolute left-4 bottom-4 text-rose-300 pointer-events-none"></i>
-                        {{ pharmacist_form.email }}
-                    </div>
-                    <div class="relative">
-                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Password</label>
-                        <i class="fas fa-lock absolute left-4 bottom-4 text-rose-300 pointer-events-none"></i>
-                        {{ pharmacist_form.password }}
-                    </div>
-                    <div class="flex gap-4 pt-4">
-                        <button type="button" onclick="showForm('selection')" class="flex-1 py-4 rounded-2xl font-bold text-rose-600 bg-rose-50 hover:bg-rose-100">Back</button>
-                        <button type="button" onclick="handleSubmit('reg-pharmacist-form')" class="flex-[2] py-4 cherry-gradient text-white rounded-2xl font-black shadow-xl hover:scale-[1.02] transition-transform">Register</button>
                     </div>
                 </form>
             </div>
@@ -164,31 +479,57 @@
     <script>
         function showForm(role) {
             const subtitle = document.getElementById('role-subtitle');
+            const card = document.getElementById('main-card');
+
             document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
-            
+
             if (role === 'selection') {
                 document.getElementById('role-selection').classList.add('active');
-                subtitle.innerText = "Select your role to continue";
-            } else if (role === 'patient') {
-                document.getElementById('patient-form').classList.add('active');
-                subtitle.innerText = "Patient Registration";
+                subtitle.innerText = "Select account type";
+                card.classList.remove('wide-book');
             } else if (role === 'pharmacist') {
                 document.getElementById('pharmacist-form').classList.add('active');
-                subtitle.innerText = "Pharmacist Registration";
+                subtitle.innerText = "Pharmacy Setup";
+                card.classList.add('wide-book');
+            } else {
+                document.getElementById('patient-form').classList.add('active');
+                subtitle.innerText = "Patient Setup";
+                card.classList.remove('wide-book');
             }
         }
 
-        function handleSubmit(formId) {
-            const form = document.getElementById(formId);
-            
-            // Show Success Overlay
-            document.getElementById('success-overlay').style.display = 'flex';
+        function showLoading() {
+            // Only show overlay if the form is valid (basic browser check)
+            const activeForm = document.querySelector('.form-section.active form');
+            if (activeForm && activeForm.checkValidity()) {
+                document.getElementById('loading-overlay').style.display = 'flex';
+            }
+        }
 
-            // Wait 1 second for animation, then submit for real
-            setTimeout(() => {
-                form.submit();
-            }, 1000);
+        window.onload = function () {
+            const tracker = document.getElementById('error-tracker');
+            const patientErrors = tracker.getAttribute('data-patient-has-errors') === 'true';
+            const pharmacistErrors = tracker.getAttribute('data-pharmacist-has-errors') === 'true';
+            const isRegistered = tracker.getAttribute('data-registered') === 'true';
+
+            // Handle success
+            if (isRegistered) {
+                document.getElementById('success-modal').style.display = 'flex';
+                setTimeout(() => { window.location.href = "{% url 'login' %}"; }, 2000);
+                return;
+            }
+
+            // Apply red borders to inputs with errors
+            document.querySelectorAll('.error-text').forEach(err => {
+                const input = err.parentElement.querySelector('input, select');
+                if (input) input.classList.add('input-error');
+            });
+
+            // Persist the correct form view if errors exist
+            if (patientErrors) showForm('patient');
+            else if (pharmacistErrors) showForm('pharmacist');
         }
     </script>
 </body>
+
 </html>

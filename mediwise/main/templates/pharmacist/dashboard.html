@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <title>Mediwise | Pharmacist Dashboard</title>
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: linear-gradient(135deg, #f0f9ff 0%, #ecfdf5 50%, #fef3f2 100%);
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+        ::-webkit-scrollbar { display: none; }
+
+        .sidebar-gradient {
+            background: linear-gradient(180deg, #ffffff 0%, #fff7f8 100%);
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.08);
+        }
+
+        .active-link {
+            background: linear-gradient(90deg, #fee2e2 0%, #fef2f2 100%);
+            color: #be123c;
+            border-left: 3px solid #be123c;
+        }
+
+        .sidebar-transition { 
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); 
+        }
+        .expanded-sidebar { width: 280px; }
+        .collapsed-sidebar { width: 100px; }
+
+        @keyframes fadeInScale {
+            from { opacity: 0; transform: scale(0.98) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .animate-entrance {
+            animation: fadeInScale 0.6s cubic-bezier(0.2, 1, 0.3, 1) forwards;
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #be123c 0%, #ea4335 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .shine-effect {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .shine-effect:hover::after {
+            content: '';
+            position: absolute;
+            top: -50%; left: -60%; width: 20%; height: 200%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: rotate(25deg);
+            transition: all 0.6s;
+            left: 120%;
+        }
+        
+        .stat-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+    </style>
+</head>
+<body class="text-slate-900">
+
+    <aside id="sidebar" class="sidebar-transition expanded-sidebar fixed top-0 left-0 h-screen sidebar-gradient border-r border-rose-100 z-50 flex flex-col">
+        <div class="p-8">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-gradient-to-br from-green-600 to-emerald-600 rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-200">
+                    <i class="fas fa-prescription-bottle text-white text-lg"></i>
+                </div>
+                <span class="sidebar-text font-black text-2xl tracking-tighter text-slate-800">Mediwise</span>
+            </div>
+        </div>
+
+        <nav class="flex-1 px-4 space-y-2">
+            <a href="{% url 'pharmacist_dashboard' %}" class="active-link flex items-center p-4 rounded-2xl">
+                <i class="fas fa-chart-line text-lg w-6"></i>
+                <span class="sidebar-text ml-4 font-bold text-sm">Dashboard</span>
+            </a>
+            <a href="{% url 'pharmacist_profile' %}" class="flex items-center p-4 rounded-2xl text-slate-500 hover:bg-rose-50 hover:text-rose-600 transition-all">
+                <i class="fas fa-shield-halved text-lg w-6"></i>
+                <span class="sidebar-text ml-4 font-bold text-sm">Profile</span>
+            </a>
+            <a href="#" class="flex items-center p-4 rounded-2xl text-slate-500 hover:bg-rose-50 hover:text-rose-600 transition-all">
+                <i class="fas fa-pills text-lg w-6"></i>
+                <span class="sidebar-text ml-4 font-bold text-sm">Inventory</span>
+            </a>
+        </nav>
+
+        <div class="p-4 border-t border-rose-50 space-y-2">
+            <button id="toggle-btn" class="w-full flex items-center p-4 rounded-2xl text-slate-400 hover:text-rose-600 transition-all">
+                <i class="fas fa-indent text-lg w-6" id="toggle-icon"></i>
+                <span class="sidebar-text ml-4 font-bold text-xs uppercase tracking-widest">Collapse</span>
+            </button>
+            <a href="{% url 'logout' %}" class="flex items-center p-4 rounded-2xl text-rose-600 bg-rose-50 hover:bg-rose-600 hover:text-white transition-all shadow-sm">
+                <i class="fas fa-sign-out-alt text-lg w-6"></i>
+                <span class="sidebar-text ml-4 font-bold text-sm">Logout</span>
+            </a>
+        </div>
+    </aside>
+
+    <main id="main-content" class="sidebar-transition ml-[280px] p-8 lg:p-12">
+        <header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
+            <div>
+                <h1 class="text-5xl font-extrabold text-slate-900 tracking-tight">Welcome Back, <span class="gradient-text">{{ pharmacist.first_name|default:"Alex" }} {{ pharmacist.last_name|default:"Pharmacist" }}</span></h1>
+                <p class="text-slate-500 font-medium mt-2 text-lg">Manage your pharmacy operations efficiently</p>
+            </div>
+            
+            <div class="flex items-center gap-4 bg-white/80 backdrop-blur-lg p-2 rounded-2xl shadow-sm border border-white">
+                <div class="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold text-xs shadow-lg shadow-emerald-200">
+                    PH
+                </div>
+                <div class="pr-4">
+                    <p class="text-xs font-bold text-slate-800 leading-tight">{{ pharmacist.first_name|default:"Pharmacist" }}</p>
+                    <p class="text-[10px] text-slate-500">{{ pharmacist.email|default:"pharmacist@mediwise.com" }}</p>
+                </div>
+            </div>
+        </header>
+
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+            <div class="glass-card rounded-[2rem] p-6 stat-card">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-slate-500 text-sm font-medium">Pending Prescriptions</p>
+                        <p class="text-3xl font-extrabold text-slate-900 mt-2">{{ data.prescriptions_pending }}</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-600">
+                        <i class="fas fa-file-prescription text-xl"></i>
+                    </div>
+                </div>
+                <div class="mt-4 pt-4 border-t border-slate-100">
+                    <span class="text-xs text-slate-400">+2 from yesterday</span>
+                </div>
+            </div>
+
+            <div class="glass-card rounded-[2rem] p-6 stat-card">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-slate-500 text-sm font-medium">Low Stock Items</p>
+                        <p class="text-3xl font-extrabold text-slate-900 mt-2">{{ data.medications_low_stock }}</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-2xl bg-amber-50 flex items-center justify-center text-amber-600">
+                        <i class="fas fa-exclamation-triangle text-xl"></i>
+                    </div>
+                </div>
+                <div class="mt-4 pt-4 border-t border-slate-100">
+                    <span class="text-xs text-slate-400">Requires attention</span>
+                </div>
+            </div>
+
+            <div class="glass-card rounded-[2rem] p-6 stat-card">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-slate-500 text-sm font-medium">Today's Orders</p>
+                        <p class="text-3xl font-extrabold text-slate-900 mt-2">{{ data.today_orders }}</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-2xl bg-emerald-50 flex items-center justify-center text-emerald-600">
+                        <i class="fas fa-box-open text-xl"></i>
+                    </div>
+                </div>
+                <div class="mt-4 pt-4 border-t border-slate-100">
+                    <span class="text-xs text-slate-400">+5 from yesterday</span>
+                </div>
+            </div>
+
+            <div class="glass-card rounded-[2rem] p-6 stat-card">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-slate-500 text-sm font-medium">Weekly Sales</p>
+                        <p class="text-3xl font-extrabold text-slate-900 mt-2">₹{{ data.weekly_sales }}</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-2xl bg-purple-50 flex items-center justify-center text-purple-600">
+                        <i class="fas fa-rupee-sign text-xl"></i>
+                    </div>
+                </div>
+                <div class="mt-4 pt-4 border-t border-slate-100">
+                    <span class="text-xs text-slate-400">+12% from last week</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Customers and Low Stock Medications -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Recent Customers -->
+            <div class="glass-card rounded-[2rem] p-8 animate-entrance">
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="w-14 h-14 rounded-2xl bg-rose-50 flex items-center justify-center text-rose-600">
+                        <i class="fas fa-users text-2xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-bold text-slate-900">Recent Customers</h3>
+                        <p class="text-slate-500 text-sm">Customers who visited recently</p>
+                    </div>
+                </div>
+                
+                <div class="space-y-4">
+                    {% for customer in data.recent_customers %}
+                    <div class="flex items-center justify-between p-4 bg-white/50 rounded-2xl">
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 rounded-full bg-rose-100 flex items-center justify-center text-rose-600 font-bold text-sm">
+                                {{ customer.name.0 }}
+                            </div>
+                            <div>
+                                <p class="font-bold text-slate-900">{{ customer.name }}</p>
+                                <p class="text-xs text-slate-500">{{ customer.contact }}</p>
+                            </div>
+                        </div>
+                        <span class="px-3 py-1 bg-emerald-100 text-emerald-700 rounded-full text-xs font-medium">
+                            {{ customer.last_visit }}
+                        </span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Low Stock Medications -->
+            <div class="glass-card rounded-[2rem] p-8 animate-entrance">
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="w-14 h-14 rounded-2xl bg-amber-50 flex items-center justify-center text-amber-600">
+                        <i class="fas fa-pills text-2xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-bold text-slate-900">Low Stock Medications</h3>
+                        <p class="text-slate-500 text-sm">Items needing restocking</p>
+                    </div>
+                </div>
+                
+                <div class="space-y-4">
+                    {% for medication in data.low_stock_medications %}
+                    <div class="flex items-center justify-between p-4 bg-white/50 rounded-2xl">
+                        <div>
+                            <p class="font-bold text-slate-900">{{ medication.name }}</p>
+                            <p class="text-xs text-slate-500">Medication</p>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <span class="px-3 py-1 bg-amber-100 text-amber-700 rounded-full text-xs font-medium">
+                                {{ medication.quantity }} left
+                            </span>
+                            <button class="px-4 py-2 bg-rose-100 text-rose-600 rounded-xl text-xs font-bold hover:bg-rose-200 transition-colors">
+                                Restock
+                            </button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Sidebar Logic
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('main-content');
+        const toggleBtn = document.getElementById('toggle-btn');
+        const toggleIcon = document.getElementById('toggle-icon');
+        const sidebarTexts = document.querySelectorAll('.sidebar-text');
+
+        let isExpanded = true;
+
+        toggleBtn.addEventListener('click', () => {
+            isExpanded = !isExpanded;
+            if (isExpanded) {
+                sidebar.classList.replace('collapsed-sidebar', 'expanded-sidebar');
+                mainContent.style.marginLeft = '280px';
+                toggleIcon.style.transform = 'rotate(0deg)';
+                sidebarTexts.forEach(el => el.style.display = 'inline');
+            } else {
+                sidebar.classList.replace('expanded-sidebar', 'collapsed-sidebar');
+                mainContent.style.marginLeft = '100px';
+                toggleIcon.style.transform = 'rotate(180deg)';
+                sidebarTexts.forEach(el => el.style.display = 'none');
+            }
+        });
+    </script>
+</body>
+</html>
